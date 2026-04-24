@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="mail_template_sale_order_website_inquiry" model="mail.template">
+            <field name="name">eCommerce: New quote request (admin)</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <!-- 关闭默认收件人：否则 sale.order 会把 partner_id（客户）一并加入 To -->
+            <field name="use_default_to" eval="False"/>
+            <field name="subject">New website quote request: {{ object.name }}</field>
+            <field name="email_from">{{ (object.company_id.email_formatted or user.email_formatted or '') }}</field>
+            <field name="body_html" type="html">
+<div>
+    <p>A new quote request was submitted from the website.</p>
+    <p>
+        <strong>Order:</strong> <t t-out="object.name"/>
+        <br/>
+        <strong>Customer email:</strong> <t t-out="object.inquiry_contact_email or object.partner_id.email or ''"/>
+        <br t-if="object.inquiry_company_name"/>
+        <t t-if="object.inquiry_company_name">
+            <strong>Company:</strong> <t t-out="object.inquiry_company_name"/>
+        </t>
+    </p>
+    <p>
+        <a t-att-href="'%s/web#id=%s&amp;model=sale.order&amp;view_type=form' % (object.get_base_url(), object.id)">Open quotation</a>
+    </p>
+    <table t-if="object.order_line" border="0" cellpadding="4" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th align="left">Product</th>
+                <th align="right">Qty</th>
+                <th align="right">Expected unit price</th>
+                <th align="left">Note</th>
+            </tr>
+        </thead>
+        <tbody>
+            <t t-foreach="object.order_line" t-as="line">
+                <tr t-if="line.product_id">
+                    <td><t t-out="line.product_id.display_name"/></td>
+                    <td align="right"><t t-out="line.product_uom_qty"/></td>
+                    <td align="right">
+                        <t t-if="line.price_unit not in (False, None)">
+                            <span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": line.currency_id}'/>
+                        </t>
+                        <t t-else="">—</t>
+                    </td>
+                    <td><t t-out="line.inquiry_line_note or ''"/></td>
+                </tr>
+            </t>
+        </tbody>
+    </table>
+    <t t-if="not is_html_empty(object.note)">
+        <p style="margin-top: 16px; margin-bottom: 8px;">
+            <strong>Order note:</strong>
+        </p>
+        <div style="font-size: 13px;" t-out="object.note"/>
+    </t>
+</div>
+            </field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+    </data>
+</odoo>

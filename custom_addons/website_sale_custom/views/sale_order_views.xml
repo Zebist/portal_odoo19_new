@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_inquiry" model="ir.ui.view">
+        <field name="name">sale.order.form.inquiry</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet//group[@name='sale_header']" position="after">
+                <group name="website_inquiry" string="Website inquiry" invisible="not is_website_inquiry">
+                    <field name="is_website_inquiry" readonly="1"/>
+                    <field name="inquiry_contact_email" readonly="1"/>
+                    <field name="inquiry_company_name" readonly="1"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_order_line_form_inquiry" model="ir.ui.view">
+        <field name="name">sale.order.form.order.line.inquiry</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!-- 行内编辑走 list；弹层编辑走 form，两处都要加（与 sale_margin 等模块一致） -->
+            <xpath expr="//field[@name='order_line']//form//field[@name='price_unit']" position="after">
+                <field name="inquiry_line_note" invisible="not parent.is_website_inquiry"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//list//field[@name='price_unit']" position="after">
+                <field
+                    name="inquiry_line_note"
+                    invisible="not parent.is_website_inquiry"
+                    optional="show"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

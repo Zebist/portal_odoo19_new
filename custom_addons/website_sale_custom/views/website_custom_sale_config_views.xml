@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_website_custom_sale_config_tree" model="ir.ui.view">
+        <field name="name">website.custom.sale.config.list</field>
+        <field name="model">website.custom.sale.config</field>
+        <field name="arch" type="xml">
+            <list string="Website Custom Sale">
+                <field name="website_id"/>
+                <field name="enable_checkout"/>
+                <field name="enable_inquiry"/>
+                <field name="show_cart_checkout_wizard"/>
+                <field name="notify_email"/>
+                <field name="notify_email_from"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_website_custom_sale_config_form" model="ir.ui.view">
+        <field name="name">website.custom.sale.config.form</field>
+        <field name="model">website.custom.sale.config</field>
+        <field name="arch" type="xml">
+            <form string="Website Custom Sale">
+                <sheet>
+                    <group>
+                        <field name="website_id" options="{'no_create': True}"/>
+                        <field name="company_id" groups="base.group_multi_company" readonly="1"/>
+                    </group>
+                    <group string="Shop behavior">
+                        <field name="enable_checkout"/>
+                        <field name="enable_inquiry"/>
+                        <field name="show_cart_checkout_wizard"/>
+                    </group>
+                    <group string="Inquiry notifications">
+                        <field name="notify_email" placeholder="e.g. sales@example.com"/>
+                        <field name="notify_email_from" placeholder="sales@example.com"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_website_custom_sale_config" model="ir.actions.act_window">
+        <field name="name">Custom Sale Settings</field>
+        <field name="res_model">website.custom.sale.config</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a configuration for each website.
+            </p>
+            <p>
+                Toggle checkout and quote request behavior, and set the email address for inquiry notifications.
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+        id="menu_website_custom_sale_config"
+        name="Custom Sale Settings"
+        parent="website_sale.menu_ecommerce_settings"
+        action="action_website_custom_sale_config"
+        sequence="200"
+    />
+</odoo>

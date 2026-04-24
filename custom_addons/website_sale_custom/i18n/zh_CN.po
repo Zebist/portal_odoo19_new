@@ -1,0 +1,544 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* website_sale_custom
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-18 13:46+0000\n"
+"PO-Revision-Date: 2026-04-18 13:46+0000\n"
+"Last-Translator: \n"
+"Language-Team: Chinese (China)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh_CN\n"
+
+#. module: website_sale_custom
+#: model:mail.template,body_html:website_sale_custom.mail_template_sale_order_website_inquiry
+msgid ""
+"<div>\n"
+"    <p>A new quote request was submitted from the website.</p>\n"
+"    <p>\n"
+"        <strong>Order:</strong> <t t-out=\"object.name\"/>\n"
+"        <br/>\n"
+"        <strong>Customer email:</strong> <t t-out=\"object.inquiry_contact_email or object.partner_id.email or ''\"/>\n"
+"        <br t-if=\"object.inquiry_company_name\"/>\n"
+"        <t t-if=\"object.inquiry_company_name\">\n"
+"            <strong>Company:</strong> <t t-out=\"object.inquiry_company_name\"/>\n"
+"        </t>\n"
+"    </p>\n"
+"    <p>\n"
+"        <a t-att-href=\"'%s/web#id=%s&amp;model=sale.order&amp;view_type=form' % (object.get_base_url(), object.id)\">Open quotation</a>\n"
+"    </p>\n"
+"    <table t-if=\"object.order_line\" border=\"0\" cellpadding=\"4\" cellspacing=\"0\" width=\"100%\">\n"
+"        <thead>\n"
+"            <tr>\n"
+"                <th align=\"left\">Product</th>\n"
+"                <th align=\"right\">Qty</th>\n"
+"                <th align=\"right\">Expected unit price</th>\n"
+"                <th align=\"left\">Note</th>\n"
+"            </tr>\n"
+"        </thead>\n"
+"        <tbody>\n"
+"            <t t-foreach=\"object.order_line\" t-as=\"line\">\n"
+"                <tr t-if=\"line.product_id\">\n"
+"                    <td><t t-out=\"line.product_id.display_name\"/></td>\n"
+"                    <td align=\"right\"><t t-out=\"line.product_uom_qty\"/></td>\n"
+"                    <td align=\"right\">\n"
+"                        <t t-if=\"line.price_unit not in (False, None)\">\n"
+"                            <span t-field=\"line.price_unit\" t-options=\"{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: line.currency_id}\"/>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">—</t>\n"
+"                    </td>\n"
+"                    <td><t t-out=\"line.inquiry_line_note or ''\"/></td>\n"
+"                </tr>\n"
+"            </t>\n"
+"        </tbody>\n"
+"    </table>\n"
+"    <t t-if=\"not is_html_empty(object.note)\">\n"
+"        <p style=\"margin-top: 16px; margin-bottom: 8px;\">\n"
+"            <strong>Order note:</strong>\n"
+"        </p>\n"
+"        <div style=\"font-size: 13px;\" t-out=\"object.note\"/>\n"
+"    </t>\n"
+"</div>\n"
+"            "
+msgstr ""
+"<div>\n"
+"    <p>网站提交了新的询价请求。</p>\n"
+"    <p>\n"
+"        <strong>订单：</strong> <t t-out=\"object.name\"/>\n"
+"        <br/>\n"
+"        <strong>客户邮箱：</strong> <t t-out=\"object.inquiry_contact_email or object.partner_id.email or ''\"/>\n"
+"        <br t-if=\"object.inquiry_company_name\"/>\n"
+"        <t t-if=\"object.inquiry_company_name\">\n"
+"            <strong>公司：</strong> <t t-out=\"object.inquiry_company_name\"/>\n"
+"        </t>\n"
+"    </p>\n"
+"    <p>\n"
+"        <a t-att-href=\"'%s/web#id=%s&amp;model=sale.order&amp;view_type=form' % (object.get_base_url(), object.id)\">打开报价单</a>\n"
+"    </p>\n"
+"    <table t-if=\"object.order_line\" border=\"0\" cellpadding=\"4\" cellspacing=\"0\" width=\"100%\">\n"
+"        <thead>\n"
+"            <tr>\n"
+"                <th align=\"left\">商品</th>\n"
+"                <th align=\"right\">数量</th>\n"
+"                <th align=\"right\">期望单价</th>\n"
+"                <th align=\"left\">备注</th>\n"
+"            </tr>\n"
+"        </thead>\n"
+"        <tbody>\n"
+"            <t t-foreach=\"object.order_line\" t-as=\"line\">\n"
+"                <tr t-if=\"line.product_id\">\n"
+"                    <td><t t-out=\"line.product_id.display_name\"/></td>\n"
+"                    <td align=\"right\"><t t-out=\"line.product_uom_qty\"/></td>\n"
+"                    <td align=\"right\">\n"
+"                        <t t-if=\"line.price_unit not in (False, None)\">\n"
+"                            <span t-field=\"line.price_unit\" t-options=\"{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: line.currency_id}\"/>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">—</t>\n"
+"                    </td>\n"
+"                    <td><t t-out=\"line.inquiry_line_note or ''\"/></td>\n"
+"                </tr>\n"
+"            </t>\n"
+"        </tbody>\n"
+"    </table>\n"
+"    <t t-if=\"not is_html_empty(object.note)\">\n"
+"        <p style=\"margin-top: 16px; margin-bottom: 8px;\">\n"
+"            <strong>整单备注：</strong>\n"
+"        </p>\n"
+"        <div style=\"font-size: 13px;\" t-out=\"object.note\"/>\n"
+"    </t>\n"
+"</div>\n"
+"            "
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form_line
+msgid "<span class=\"o_ws_inquiry_line_subtotal text-muted\">—</span>"
+msgstr "<span class=\"o_ws_inquiry_line_subtotal text-muted\">—</span>"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form_table_block
+msgid "<span class=\"o_ws_inquiry_order_total\">—</span>"
+msgstr "<span class=\"o_ws_inquiry_order_total\">—</span>"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form
+msgid "Back to cart"
+msgstr "返回购物车"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/website_custom_sale_config.py:0
+#: model:ir.model.fields,field_description:website_sale_custom.field_website_custom_sale_config__company_id
+msgid "Company"
+msgstr "公司"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form
+msgid "Company name"
+msgstr "公司名称"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.navigation_buttons_inquiry
+msgid "Confirm Order"
+msgstr "确认订单"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_thanks
+msgid "Continue shopping"
+msgstr "继续购物"
+
+#. module: website_sale_custom
+#: model_terms:ir.actions.act_window,help:website_sale_custom.action_website_custom_sale_config
+msgid "Create a configuration for each website."
+msgstr "为每个网站创建一条配置。"
+
+#. module: website_sale_custom
+#: model:ir.model.fields,field_description:website_sale_custom.field_website_custom_sale_config__create_uid
+msgid "Created by"
+msgstr "创建人"
+
+#. module: website_sale_custom
+#: model:ir.model.fields,field_description:website_sale_custom.field_website_custom_sale_config__create_date
+msgid "Created on"
+msgstr "创建时间"
+
+#. module: website_sale_custom
+#: model:ir.actions.act_window,name:website_sale_custom.action_website_custom_sale_config
+#: model:ir.ui.menu,name:website_sale_custom.menu_website_custom_sale_config
+msgid "Custom Sale Settings"
+msgstr "自定义商城销售设置"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form
+msgid "Delivery, billing, or other comments for your quote request."
+msgstr "交货、开票或您对本次询价的其他说明。"
+
+#. module: website_sale_custom
+#: model:ir.model.fields,field_description:website_sale_custom.field_sale_order__display_name
+#: model:ir.model.fields,field_description:website_sale_custom.field_sale_order_line__display_name
+#: model:ir.model.fields,field_description:website_sale_custom.field_website__display_name
+#: model:ir.model.fields,field_description:website_sale_custom.field_website_custom_sale_config__display_name
+msgid "Display Name"
+msgstr "显示名称"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form
+msgid "Email address"
+msgstr "电子邮箱"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/sale_order.py:0
+#: model:ir.model.fields,help:website_sale_custom.field_sale_order__inquiry_contact_email
+msgid ""
+"Email address entered by the visitor when submitting the quote request."
+msgstr "访客提交询价时填写的电子邮箱。"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/website_custom_sale_config.py:0
+#: model:ir.model.fields,help:website_sale_custom.field_website_custom_sale_config__notify_email
+msgid ""
+"Email address that receives notifications when a customer submits a quote "
+"request."
+msgstr "客户提交询价时将收到通知的邮箱地址。"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/website_custom_sale_config.py:0
+#: model:ir.model.fields,field_description:website_sale_custom.field_website_custom_sale_config__enable_checkout
+msgid "Enable Checkout"
+msgstr "启用结账"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/website_custom_sale_config.py:0
+#: model:ir.model.fields,field_description:website_sale_custom.field_website_custom_sale_config__enable_inquiry
+msgid "Enable Request Quote"
+msgstr "启用询价"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form_table_block
+msgid "Expected unit price"
+msgstr "期望单价"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form
+msgid "Full name"
+msgstr "姓名"
+
+#. module: website_sale_custom
+#: model:ir.model.fields,field_description:website_sale_custom.field_sale_order__id
+#: model:ir.model.fields,field_description:website_sale_custom.field_sale_order_line__id
+#: model:ir.model.fields,field_description:website_sale_custom.field_website__id
+#: model:ir.model.fields,field_description:website_sale_custom.field_website_custom_sale_config__id
+msgid "ID"
+msgstr "ID"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/sale_order.py:0
+#: model:ir.model.fields,field_description:website_sale_custom.field_sale_order__inquiry_company_name
+msgid "Inquiry Company Name"
+msgstr "询价公司名称"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/sale_order.py:0
+#: model:ir.model.fields,field_description:website_sale_custom.field_sale_order__inquiry_contact_email
+msgid "Inquiry Contact Email"
+msgstr "询价联系邮箱"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/website_custom_sale_config.py:0
+#: model:ir.model.fields,field_description:website_sale_custom.field_website_custom_sale_config__notify_email
+msgid "Inquiry Notification Email"
+msgstr "询价通知邮箱"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/website_custom_sale_config.py:0
+#: model:ir.model.fields,field_description:website_sale_custom.field_website_custom_sale_config__notify_email_from
+msgid "Inquiry Notification From"
+msgstr "询价通知发件人"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.view_website_custom_sale_config_form
+msgid "Inquiry notifications"
+msgstr "询价通知"
+
+#. module: website_sale_custom
+#: model:ir.model.fields,field_description:website_sale_custom.field_website_custom_sale_config__write_uid
+msgid "Last Updated by"
+msgstr "最后更新人"
+
+#. module: website_sale_custom
+#: model:ir.model.fields,field_description:website_sale_custom.field_website_custom_sale_config__write_date
+msgid "Last Updated on"
+msgstr "最后更新时间"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form
+msgid "Legal or trading name"
+msgstr "注册或经营用名称"
+
+#. module: website_sale_custom
+#: model:mail.template,subject:website_sale_custom.mail_template_sale_order_website_inquiry
+msgid "New website quote request: {{ object.name }}"
+msgstr "新网站询价：{{ object.name }}"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form_table_block
+msgid "Note"
+msgstr "备注"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/sale_order_line.py:0
+#: model:ir.model.fields,help:website_sale_custom.field_sale_order_line__inquiry_line_note
+msgid "Note left by the customer for this line (website quote request)."
+msgstr "客户在网站询价中为本明细行填写的备注。"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/website_custom_sale_config.py:0
+#: model:ir.model.constraint,message:website_sale_custom.constraint_website_custom_sale_config_website_id_unique
+msgid "Only one configuration record is allowed per website."
+msgstr "每个网站仅允许一条配置记录。"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form_line
+msgid "Optional"
+msgstr "可选"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/sale_order.py:0
+#: model:ir.model.fields,help:website_sale_custom.field_sale_order__inquiry_company_name
+msgid "Optional company name submitted with the website quote request."
+msgstr "提交网站询价时填写的公司名称（可选）。"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/website_custom_sale_config.py:0
+#: model:ir.model.fields,help:website_sale_custom.field_website_custom_sale_config__notify_email_from
+msgid ""
+"Optional sender address for inquiry notification emails. Examples: "
+"sales@example.com or \"My Shop\" <sales@example.com>. Leave empty to use the"
+" mail template default (company or system user)."
+msgstr ""
+"询价通知邮件的可选发件人地址。例如：sales@example.com 或 \"我的店铺\" <sales@example.com>。"
+"留空则使用邮件模板默认值（公司或系统用户）。"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form
+msgid "Order note"
+msgstr "整单备注"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form
+msgid "Please enter a valid email address so we can reach you."
+msgstr "请输入有效的电子邮箱，以便我们与您联系。"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form_table_block
+msgid "Product"
+msgstr "商品"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form_table_block
+msgid "Quantity"
+msgstr "数量"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/sale_order_line.py:0
+#: model:ir.model.fields,field_description:website_sale_custom.field_sale_order_line__inquiry_line_note
+msgid "Quote Line Note"
+msgstr "询价行备注"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form_line
+msgid "Remove"
+msgstr "移除"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form_line
+msgid "Remove this line from the quote request"
+msgstr "从询价单中删除本行"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.cta_wrapper_inquiry_link
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.navigation_buttons_inquiry
+msgid "Request a quote"
+msgstr "申请报价"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form
+msgid ""
+"Review your items, add your expected prices and notes, then submit. We will "
+"email you about your quotation."
+msgstr ""
+"请核对商品，填写期望单价与备注后提交。我们将通过邮件与您沟通报价事宜。"
+
+#. module: website_sale_custom
+#: model:ir.model,name:website_sale_custom.model_sale_order
+msgid "Sales Order"
+msgstr "销售订单"
+
+#. module: website_sale_custom
+#: model:ir.model,name:website_sale_custom.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "销售订单明细"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/sale_order.py:0
+#: model:ir.model.fields,help:website_sale_custom.field_sale_order__is_website_inquiry
+msgid ""
+"Set when this quotation was submitted from the website quote request flow."
+msgstr "当本报价单通过网站询价流程提交时自动勾选。"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.view_website_custom_sale_config_form
+msgid "Shop behavior"
+msgstr "店铺行为"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/website_custom_sale_config.py:0
+#: model:ir.model.fields,field_description:website_sale_custom.field_website_custom_sale_config__show_cart_checkout_wizard
+msgid "Show Checkout Steps on Cart"
+msgstr "在购物车页显示结账步骤"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form
+msgid "Submit quote request"
+msgstr "提交询价"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form_table_block
+msgid "Subtotal"
+msgstr "小计"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_thanks
+msgid "Thank you"
+msgstr "谢谢"
+
+#. module: website_sale_custom
+#: model_terms:ir.actions.act_window,help:website_sale_custom.action_website_custom_sale_config
+msgid ""
+"Toggle checkout and quote request behavior, and set the email address for "
+"inquiry notifications."
+msgstr ""
+"控制结账与询价相关行为，并设置接收询价通知的邮箱地址。"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form_table_block
+msgid "Total"
+msgstr "合计"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_thanks
+msgid "We have received your quote request"
+msgstr "我们已收到您的询价"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_thanks
+msgid ""
+"We will contact you by email shortly to discuss details and provide a formal"
+" quotation."
+msgstr ""
+"我们将尽快通过邮件与您沟通细节并发送正式报价。"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/website_custom_sale_config.py:0
+#: model:ir.model,name:website_sale_custom.model_website
+#: model:ir.model.fields,field_description:website_sale_custom.field_website_custom_sale_config__website_id
+msgid "Website"
+msgstr "网站"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.view_website_custom_sale_config_form
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.view_website_custom_sale_config_tree
+msgid "Website Custom Sale"
+msgstr "网站商城自定义销售"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/website_custom_sale_config.py:0
+#: model:ir.model,name:website_sale_custom.model_website_custom_sale_config
+msgid "Website Custom eCommerce & Inquiry Settings"
+msgstr "网站电商与询价设置"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/sale_order.py:0
+#: model:ir.model.fields,field_description:website_sale_custom.field_sale_order__is_website_inquiry
+msgid "Website Quote Request"
+msgstr "网站询价"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.view_order_form_inquiry
+msgid "Website inquiry"
+msgstr "网站询价"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/website_custom_sale_config.py:0
+#: model:ir.model.fields,help:website_sale_custom.field_website_custom_sale_config__enable_checkout
+msgid ""
+"When enabled, customers can proceed to the standard checkout and place "
+"orders."
+msgstr "开启后，客户可按标准流程结账并下单。"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/website_custom_sale_config.py:0
+#: model:ir.model.fields,help:website_sale_custom.field_website_custom_sale_config__enable_inquiry
+msgid "When enabled, customers can submit quote requests from the shop."
+msgstr "开启后，客户可在网店提交询价。"
+
+#. module: website_sale_custom
+#. odoo-python
+#: code:addons/website_sale_custom/models/website_custom_sale_config.py:0
+#: model:ir.model.fields,help:website_sale_custom.field_website_custom_sale_config__show_cart_checkout_wizard
+msgid ""
+"When enabled, the Order / Address / Payment progress bar is shown at the top"
+" of the shopping cart page (/shop/cart)."
+msgstr ""
+"开启后，在购物车页面（/shop/cart）顶部显示「订单 / 地址 / 付款」进度条。"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form
+msgid "Your name"
+msgstr "您的姓名"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.view_website_custom_sale_config_form
+msgid "e.g. sales@example.com"
+msgstr "例如：sales@example.com"
+
+#. module: website_sale_custom
+#: model:mail.template,name:website_sale_custom.mail_template_sale_order_website_inquiry
+msgid "eCommerce: New quote request (admin)"
+msgstr "电商：新询价（管理员通知）"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.view_website_custom_sale_config_form
+msgid "sales@example.com"
+msgstr "sales@example.com"
+
+#. module: website_sale_custom
+#: model_terms:ir.ui.view,arch_db:website_sale_custom.inquiry_form
+msgid "you@example.com"
+msgstr "you@example.com"

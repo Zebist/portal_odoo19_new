@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="sale.ComboConfiguratorDialog" t-inherit-mode="extension">
+        <button name="website_sale_combo_configurator_checkout_button" position="attributes">
+            <attribute name="t-if">this.props.isFrontend and this.customSaleEnableCheckout</attribute>
+        </button>
+        <button name="website_sale_combo_configurator_checkout_button" position="after">
+            <button
+                t-if="this.props.isFrontend and this.customSaleEnableInquiry"
+                type="button"
+                name="website_sale_custom_combo_configurator_inquiry_button"
+                class="btn btn-outline-secondary w-100 w-lg-auto"
+                t-on-click="() => this.confirmThenInquiry()"
+                t-att-disabled="!areAllCombosSelected || state.isLoading"
+            >
+                <t t-out="this.customSaleInquiryLinkLabel"/>
+            </button>
+        </button>
+    </t>
+</templates>

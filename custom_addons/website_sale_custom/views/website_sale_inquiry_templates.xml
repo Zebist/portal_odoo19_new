@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        继承购物车/结账侧栏的「导航按钮」区域（website_sale.navigation_buttons）：
+        根据网站配置开关控制标准结账与「Request a quote」入口；
+        变量 custom_sale_* 由 website._get_checkout_step_values() 注入。
+    -->
+    <template id="navigation_buttons_inquiry" inherit_id="website_sale.navigation_buttons" name="Custom sale: navigation buttons">
+        <!-- 仅在开启结账时显示 Express Checkout（与核心逻辑一致，并增加 custom_sale_enable_checkout） -->
+        <xpath expr="//t[@t-call='payment.express_checkout']" position="replace">
+            <t
+                t-if="(website.account_on_checkout != 'mandatory' or not website.is_public_user()) and show_shorter_cart_summary and website_sale_order._allow_express_checkout() and custom_sale_enable_checkout"
+                t-call="payment.express_checkout"
+            />
+        </xpath>
+        <!-- 付款步骤整块：关闭结账时不展示付款/确认，避免仅关结账仍出现支付 UI -->
+        <xpath expr="//t[@t-if=&quot;current_website_checkout_step_href == '/shop/payment'&quot;]" position="replace">
+            <t t-if="current_website_checkout_step_href == '/shop/payment' and custom_sale_enable_checkout">
+                <div t-if="not errors and not website_sale_order.amount_total"
+                     name="o_website_sale_free_cart">
+                    <form name="o_wsale_confirm_order"
+                          class="d-flex flex-column"
+                          target="_self"
+                          action="/shop/payment/validate"
+                          method="post">
+                        <input type="hidden"
+                               name="csrf_token"
+                               t-att-value="request.csrf_token()"/>
+                        <t t-if="not hide_payment_button" t-call="payment.submit_button">
+                            <t t-set="submit_button_label">Confirm Order</t>
+                        </t>
+                    </form>
+                </div>
+                <t t-elif="not hide_payment_button" t-call="payment.submit_button"/>
+            </t>
+        </xpath>
+        <!-- 主按钮「下一步结账」：受 custom_sale_enable_checkout 控制显示 -->
+        <xpath expr="//a[@name='website_sale_main_button']" position="attributes">
+            <attribute name="t-if">custom_sale_enable_checkout</attribute>
+        </xpath>
+        <!-- 询价入口：仅当前结账步骤为购物车页时显示，避免在付款等步骤重复出现 -->
+        <xpath expr="//a[@name='website_sale_main_button']" position="after">
+            <a
+                t-if="custom_sale_enable_inquiry and current_website_checkout_step_href == '/shop/cart'"
+                role="button"
+                class="btn btn-secondary w-100"
+                href="/shop/inquiry"
+            >
+                Request a quote
+            </a>
+        </xpath>
+    </template>
+
+    <!--
+        商品详情页 CTA 区（website_sale.cta_wrapper）：在「加入购物车」旁增加询价链接，
+        跳转 /shop/inquiry 并带上当前变体 product_id，由控制器往购物车加行后再展示询价表。
+    -->
+    <template id="cta_wrapper_inquiry_link" inherit_id="website_sale.cta_wrapper" name="Custom sale: product quote link">
+        <xpath expr="//div[@id='o_wsale_cta_wrapper']" position="before">
+            <t t-set="sale_flags" t-value="website._get_website_custom_sale_public_flags()"/>
+            <t t-set="custom_sale_enable_inquiry" t-value="sale_flags['custom_sale_enable_inquiry']"/>
+        </xpath>
+        <xpath expr="//div[@id='add_to_cart_wrap']" position="after">
+            <div t-if="custom_sale_enable_inquiry and combination_info and combination_info.get('product_id')" class="flex-grow-1 flex-lg-grow-0">
+                <a
+                    role="button"
+                    class="btn btn-outline-primary w-100"
+                    t-attf-href="/shop/inquiry?product_id={{ combination_info['product_id'] }}&amp;add_qty=1"
+                >
+                    Request a quote
+                </a>
+            </div>
+        </xpath>
+    </template>
+
+    <!--
+        询价填写页：POST /shop/inquiry/submit。
+        行字段名 line_qty_*、line_expected_*、line_note_* 须与 controllers/inquiry.py 中解析一致。
+        可选公司信息字段名：inquiry_company_name（与控制器一致）。
+        整单备注字段名：inquiry_order_note → 提交时写入 sale.order.note。
+        商品列复用 website_sale 购物车同款链接与描述子模板；期望单价默认与购物车展示单价一致（_get_displayed_unit_price）。
+        行小计与订单合计由 static/src/js/website_sale_inquiry_form.js 在前端根据数量×期望单价实时计算。
+        删除行接口仍保留（POST /shop/inquiry/line/remove/&lt;line_id&gt;），前台 Remove 按钮已暂时关闭：整表 fragment 重载会导致用户未提交的改价/改数量等丢失。
+    -->
+    <!-- 整张询价明细表（与 inquiry_form 内一致），供页面初次渲染与 table_fragment 接口复用 -->
+    <template id="inquiry_form_table_block" name="Quote request table">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th class="text-end" style="min-width: 6rem;">Quantity</th>
+                    <th class="text-end" style="min-width: 8rem;">Expected unit price</th>
+                    <th class="text-end" style="min-width: 7rem;">Subtotal</th>
+                    <th>Note</th>
+                </tr>
+            </thead>
+            <tbody>
+                <t t-foreach="website_sale_order.order_line" t-as="line">
+                    <t t-call="website_sale_custom.inquiry_form_line"/>
+                </t>
+            </tbody>
+            <tfoot>
+                <tr class="border-top">
+                    <td colspan="3" class="text-end fw-bold bg-body">Total</td>
+                    <td class="text-end fw-bold bg-body text-nowrap">
+                        <span class="o_ws_inquiry_order_total">—</span>
+                    </td>
+                    <td class="bg-body"/>
+                </tr>
+            </tfoot>
+        </table>
+    </template>
+    <!--
+        单行：布局对齐购物车（图片 + 可点击标题/描述），供 inquiry_form 中 t-call。
+        依赖上下文：line、website_sale_order（与购物车页一致）。
+    -->
+    <template id="inquiry_form_line" name="Inquiry form line (cart-like)">
+        <tr
+            t-if="line.product_id"
+            class="align-top o_ws_inquiry_line_row"
+            t-att-data-line-id="line.id"
+        >
+            <t t-set="inquiry_dp" t-value="website_sale_order.currency_id.decimal_places if website_sale_order.currency_id.decimal_places is not None else 2"/>
+            <t t-set="inquiry_default_unit" t-value="round(line._get_displayed_unit_price(), inquiry_dp)"/>
+            <td class="o_inquiry_line_product" style="min-width: 280px;">
+                <div class="o_cart_product d-flex gap-3 align-items-start">
+                    <div class="o_cart_product_image flex-shrink-0" style="width: 80px;">
+                        <t t-call="website_sale.cart_line_product_link">
+                            <img
+                                t-if="not line._is_sellable() and line.product_id.image_128"
+                                t-att-src="image_data_uri(line.product_id.image_128)"
+                                class="img border rounded w-100"
+                                t-att-alt="line.name_short"
+                            />
+                            <div
+                                t-else=""
+                                t-field="line.product_id.image_128"
+                                t-options="{
+                                    'widget': 'image',
+                                    'qweb_img_responsive': False,
+                                    'class': 'border rounded w-100',
+                                }"
+                            />
+                        </t>
+                    </div>
+                    <div class="d-flex flex-column flex-grow-1 gap-1 min-w-0">
+                        <div class="d-flex flex-wrap column-gap-1 align-items-center">
+                            <t t-call="website_sale.cart_line_product_link">
+                                <h6 class="text-wrap mb-0" t-out="line._get_line_header()"/>
+                            </t>
+                            <t t-set="combination_name" t-value="line._get_combination_name()"/>
+                            <span t-if="combination_name" class="h6 text-muted mb-0">-</span>
+                            <span
+                                t-if="combination_name"
+                                class="h6 text-muted mb-0"
+                                t-out="combination_name"
+                            />
+                            <span
+                                t-if="line.product_template_id._has_multiple_uoms()"
+                                class="badge bg-light mb-0"
+                                t-out="line.product_uom_id.name"
+                            />
+                        </div>
+                        <t t-call="website_sale.cart_line_description_following_lines"/>
+                    </div>
+                </div>
+            </td>
+            <td class="text-end" style="min-width: 6rem;">
+                <input
+                    type="number"
+                    step="any"
+                    class="form-control form-control-sm text-end"
+                    t-att-name="'line_qty_%s' % line.id"
+                    t-att-value="line.product_uom_qty"
+                />
+            </td>
+            <td class="text-end" style="min-width: 8rem;">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text" t-field="website_sale_order.currency_id.symbol"/>
+                    <input
+                        type="text"
+                        class="form-control text-end"
+                        t-att-name="'line_expected_%s' % line.id"
+                        t-att-value="inquiry_default_unit"
+                    />
+                </div>
+            </td>
+            <td class="text-end text-nowrap o_ws_inquiry_subtotal_cell" style="min-width: 7rem;">
+                <span class="o_ws_inquiry_line_subtotal text-muted">—</span>
+            </td>
+            <td style="min-width: 12rem;">
+                <!-- textarea 内不能有缩进/换行，否则会变成默认空白内容，光标也不在开头 -->
+                <textarea class="form-control" rows="3" t-att-name="'line_note_%s' % line.id" placeholder="Optional"><t t-esc="line.inquiry_line_note or ''"/></textarea>
+            </td>
+            <!--
+                Remove 按钮暂时关闭：删除后通过 table_fragment 重载整表时，用户在本页已改的数量/期望单价/备注等未提交内容会丢失。
+                <td class="text-end align-top pt-2" style="min-width: 5rem;">
+                    <button type="button" class="btn btn-sm btn-outline-danger o_ws_inquiry_line_remove"
+                        title="Remove this line from the quote request"
+                        t-attf-data-remove-url="/shop/inquiry/line/remove/{{ line.id }}">Remove</button>
+                </td>
+            -->
+        </tr>
+    </template>
+
+    <template id="inquiry_form" name="Quote request">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure">
+                <section class="container py-4">
+                    <h1 class="mb-4">Request a quote</h1>
+                    <div t-if="error == 'email_required'" class="alert alert-danger" role="alert">
+                        Please enter a valid email address so we can reach you.
+                    </div>
+                    <p class="text-muted">
+                        Review your items, add your expected prices and notes, then submit. We will email you about your quotation.
+                    </p>
+                    <form
+                        action="/shop/inquiry/submit"
+                        method="post"
+                        class="o_website_sale_inquiry_form"
+                        t-att-data-currency-symbol="website_sale_order.currency_id.symbol or ''"
+                        t-att-data-currency-position="website_sale_order.currency_id.position or 'before'"
+                        t-att-data-decimal-places="website_sale_order.currency_id.decimal_places if website_sale_order.currency_id.decimal_places is not None else 2"
+                    >
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="inquiry_email">Email address</label>
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    id="inquiry_email"
+                                    name="inquiry_email"
+                                    required="required"
+                                    placeholder="you@example.com"
+                                />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="contact_name">Your name</label>
+                                <input type="text" class="form-control" id="contact_name" name="contact_name" placeholder="Full name"/>
+                            </div>
+                        </div>
+                        <!-- 可选：公司名称（与 sale.order.inquiry_company_name、邮件一致） -->
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="inquiry_company_name">Company name</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="inquiry_company_name"
+                                    name="inquiry_company_name"
+                                    placeholder="Legal or trading name"
+                                />
+                            </div>
+                        </div>
+                        <div class="table-responsive o_ws_inquiry_table_wrap">
+                            <t t-call="website_sale_custom.inquiry_form_table_block"/>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label" for="inquiry_order_note">Order note</label>
+                            <!-- 必须用成对标签且标签间无空白；自闭合 textarea 在部分浏览器下行为异常 -->
+                            <textarea id="inquiry_order_note" name="inquiry_order_note" class="form-control" rows="4" placeholder="Delivery, billing, or other comments for your quote request."></textarea>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="/shop/cart" class="btn btn-link">Back to cart</a>
+                            <button type="submit" class="btn btn-primary">Submit quote request</button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <!-- 询价提交成功页：依赖 URL 中的 order_id + access_token（由控制器在清空购物车后重定向传入） -->
+    <template id="inquiry_thanks" name="Quote request thank you">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure">
+                <section class="container py-5 text-center">
+                    <h1 class="mb-3">Thank you</h1>
+                    <p class="lead">
+                        We have received your quote request
+                        <t t-if="order.name">(<span t-field="order.name"/>)</t>.
+                    </p>
+                    <p class="text-muted">
+                        We will contact you by email shortly to discuss details and provide a formal quotation.
+                    </p>
+                    <a href="/shop" class="btn btn-primary mt-3">Continue shopping</a>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <!--
+        在 <html> 上写入 data-*，供前台 OWL（购物车配置器弹窗）读取；
+        与 website._get_website_custom_sale_public_flags() / QWeb custom_sale_* 一致。
+    -->
+    <template id="website_layout_custom_sale_html_data" inherit_id="website.layout" name="Custom sale: html data flags for OWL">
+        <xpath expr="//html" position="before">
+            <t t-set="custom_sale_html_flags" t-value="website._get_website_custom_sale_public_flags()"/>
+        </xpath>
+        <xpath expr="//html" position="attributes">
+            <attribute name="t-att-data-custom-sale-enable-checkout">'1' if custom_sale_html_flags['custom_sale_enable_checkout'] else '0'</attribute>
+            <attribute name="t-att-data-custom-sale-enable-inquiry">'1' if custom_sale_html_flags['custom_sale_enable_inquiry'] else '0'</attribute>
+        </xpath>
+    </template>
+</odoo>
