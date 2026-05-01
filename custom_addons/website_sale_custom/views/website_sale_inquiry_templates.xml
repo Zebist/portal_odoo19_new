@@ -6,10 +6,10 @@
         变量 custom_sale_* 由 website._get_checkout_step_values() 注入。
     -->
     <template id="navigation_buttons_inquiry" inherit_id="website_sale.navigation_buttons" name="Custom sale: navigation buttons">
-        <!-- 仅在开启结账时显示 Express Checkout（与核心逻辑一致，并增加 custom_sale_enable_checkout） -->
+        <!-- 仅在开启结账时显示 Express Checkout（对齐核心条件 + custom_sale_enable_checkout；核心无 _allow_express_checkout） -->
         <xpath expr="//t[@t-call='payment.express_checkout']" position="replace">
             <t
-                t-if="(website.account_on_checkout != 'mandatory' or not website.is_public_user()) and show_shorter_cart_summary and website_sale_order._allow_express_checkout() and custom_sale_enable_checkout"
+                t-if="(website.account_on_checkout != 'mandatory' or not website.is_public_user()) and show_shorter_cart_summary and custom_sale_enable_checkout"
                 t-call="payment.express_checkout"
             />
         </xpath>

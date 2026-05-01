@@ -12,6 +12,7 @@
         'views/sale_order_views.xml',
         'views/website_custom_sale_config_views.xml',
         'views/website_sale_inquiry_templates.xml',
+        'views/website_sale_product_display_name_templates.xml',
     ],
     'license': 'LGPL-3',
     'installable': True,
@@ -19,6 +20,7 @@
     'assets': {
         'web.assets_frontend': [
             'website_sale_custom/static/src/js/website_sale_inquiry_form.js',
+            # 'website_sale_custom/static/src/js/cart_service_cart_notification_fix.js',
             'website_sale_custom/static/src/js/cart_service_inquiry_redirect.js',
             'website_sale_custom/static/src/js/product_configurator_dialog/product_configurator_dialog.js',
             'website_sale_custom/static/src/js/product_configurator_dialog/product_configurator_dialog.xml',
